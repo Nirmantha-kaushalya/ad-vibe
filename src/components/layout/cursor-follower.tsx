@@ -1,9 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export function CursorFollower() {
+  const prefersReducedMotion = useReducedMotion();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const [isTouch, setIsTouch] = useState(false);
@@ -40,7 +41,7 @@ export function CursorFollower() {
     };
   }, []);
 
-  if (isTouch) {
+  if (isTouch || prefersReducedMotion) {
     return null;
   }
 

@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ad Vibe Studio
 
-## Getting Started
+A light, editorial portfolio and admin workspace for a graphic-design studio. Public project listings are stored in MongoDB; project media is uploaded directly to Cloudinary.
 
-First, run the development server:
+## Local setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Requirements: Node.js 20.9 or newer and npm.
+
+```powershell
+npm install
+Copy-Item .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Fill in `.env.local` before starting the app. Never commit that file.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### MongoDB and admin account
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Set `MONGODB_URI` to a MongoDB connection string. Set `ADMIN_USERNAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` to the credentials for the initial admin. Then create the account once:
 
-## Learn More
+```powershell
+npm run seed:admin
+```
 
-To learn more about Next.js, take a look at the following resources:
+The seed script refuses to add a second account or overwrite an existing one. Admin sessions last seven days. `JWT_SECRET` must be a random secret at least 32 bytes long; for example, generate one locally with:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Cloudinary uploads
 
-## Deploy on Vercel
+Set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`. Signed uploads work without presets. To enforce the file-size limits on Cloudinary as well as in the admin interface, create two **signed-upload** presets and put their names in `CLOUDINARY_IMAGE_UPLOAD_PRESET` and `CLOUDINARY_VIDEO_UPLOAD_PRESET`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The image preset should allow JPG/JPEG, PNG, and WebP with a 10 MB maximum. The video preset should allow MP4, WebM, and MOV with a 200 MB maximum. The upload-signing endpoint restricts formats and the browser checks file sizes. Uploads are stored in the `portfolio-works` folder.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Password reset email
+
+Configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and `SMTP_FROM` for an SMTP account. Use port `465` for implicit TLS, or a submission port such as `587` for STARTTLS. Set `NEXT_PUBLIC_SITE_URL` to the site origin (for example, `http://localhost:3000` locally and the deployed HTTPS URL in production); reset links are built from this value.
+
+## Run and validate
+
+```powershell
+npm run dev
+npm run lint
+npm run build
+npm run start
+```
+
+Configure the production environment variables in the hosting provider before deploying. The contact inbox and portfolio require MongoDB; admin media uploads require Cloudinary; password recovery requires SMTP. Update studio copy and social links in `src/content/site.ts`; provide real business contact details before publishing.

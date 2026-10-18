@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --base: #0a0a0a;
-  --panel: rgba(255, 255, 255, 0.035);
-  --ivory: #f5f1ea;
-  --muted: rgba(245, 241, 234, 0.72);
-  --gold: #c9a96e;
-  --border: rgba(255, 255, 255, 0.12);
-  --font-display: "Cormorant Garamond", Georgia, serif;
-  --font-body: "Manrope", "Segoe UI", sans-serif;
+  color-scheme: light;
+  --base: #f6f4ef;
+  --panel: rgba(255, 255, 255, 0.74);
+  --panel-hover: rgba(255, 255, 255, 0.94);
+  --ivory: #20211e;
+  --muted: #73756e;
+  --gold: #92764b;
+  --border: rgba(40, 42, 37, 0.12);
 }
 
 @theme inline {
@@ -18,23 +18,25 @@
   --font-serif: var(--font-display);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 html {
   scroll-behavior: smooth;
+  scrollbar-color: #b9ae98 var(--base);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top, rgba(201, 169, 110, 0.12), transparent 28%),
+    radial-gradient(ellipse at 84% 2%, rgba(201, 169, 110, 0.15), transparent 26rem),
     var(--base);
   color: var(--ivory);
-  font-family: var(--font-body);
-  letter-spacing: 0.01em;
-}
-
-* {
-  box-sizing: border-box;
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+  letter-spacing: 0.005em;
+  -webkit-font-smoothing: antialiased;
 }
 
 img {
@@ -46,12 +48,22 @@ body,
 input,
 textarea,
 button {
-  font-family: var(--font-body);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
 }
 
 button,
 a {
-  transition: all 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: #d9c8a6;
+  color: #20211e;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
 }
 
 .nav-link {
@@ -63,37 +75,68 @@ a {
   content: "";
   position: absolute;
   left: 0;
-  bottom: -6px;
+  bottom: -7px;
   height: 1px;
   width: 100%;
   background: var(--gold);
   transform: scaleX(0);
-  transform-origin: center;
-  transition: transform 200ms ease;
+  transform-origin: left;
+  transition: transform 220ms ease;
 }
 
 .nav-link:hover::after,
-.nav-link:focus-visible::after {
+.nav-link:focus-visible::after,
+.nav-link[data-active="true"]::after {
   transform: scaleX(1);
 }
 
 .noise-overlay {
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 0.8px, transparent 0.8px);
-  background-size: 7px 7px;
-  opacity: 0.09;
+  background-image: radial-gradient(rgba(64, 55, 40, 0.13) 0.65px, transparent 0.65px);
+  background-size: 6px 6px;
+  opacity: 0.12;
   pointer-events: none;
-  mix-blend-mode: soft-light;
-  z-index: 0;
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+
+.editorial-grid {
+  background-image: linear-gradient(to right, rgba(49, 48, 42, 0.035) 1px, transparent 1px);
+  background-size: 25% 100%;
+}
+
+.image-hover img {
+  transition: transform 800ms cubic-bezier(0.2, 0.65, 0.3, 1);
+}
+
+.image-hover:hover img {
+  transform: scale(1.045);
+}
+
+input,
+textarea,
+select {
+  color: var(--ivory);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #999990;
+}
+
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+  textarea,
+  select {
+    font-size: 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

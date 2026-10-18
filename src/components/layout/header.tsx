@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { navItems } from "@/src/content/site";
@@ -19,26 +20,24 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
-
   return (
     <header
       className={[
-        "fixed inset-x-0 top-0 z-50",
-        isScrolled ? "bg-[rgba(10,10,10,0.7)] backdrop-blur-xl" : "bg-transparent",
+        "fixed inset-x-0 top-0 z-50 border-b transition-all duration-500",
+        isScrolled
+          ? "border-[var(--border)] bg-[rgba(246,244,239,0.88)] shadow-[0_8px_30px_rgba(40,42,37,0.04)] backdrop-blur-xl"
+          : "border-transparent bg-transparent",
       ].join(" ")}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-8">
-        <Link href="/" className="flex items-center gap-3 text-[var(--ivory)]">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--gold)]/60 text-xs font-medium uppercase tracking-[0.22em] text-[var(--gold)]">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-4 md:px-10 md:py-5">
+        <Link href="/" className="group flex items-center gap-3 text-[var(--ivory)]" aria-label="Ad Vibe home">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--gold)]/50 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--gold)] transition duration-300 group-hover:bg-[var(--gold)] group-hover:text-white">
             AV
           </span>
-          <span className="text-sm uppercase tracking-[0.38em]">Ad Vibe</span>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.32em]">Ad Vibe</span>
         </Link>
 
-        <nav className="hidden items-center gap-8 text-sm uppercase tracking-[0.22em] text-[var(--muted)] md:flex">
+        <nav aria-label="Main navigation" className="hidden items-center gap-9 text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--muted)] md:flex">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -47,8 +46,9 @@ export function Header() {
                 "relative transition-colors hover:text-[var(--ivory)]",
                 pathname === item.href ? "text-[var(--ivory)]" : "",
               ].join(" ")}
+              aria-current={pathname === item.href ? "page" : undefined}
             >
-              <span className="nav-link">{item.label}</span>
+              <span className="nav-link" data-active={pathname === item.href}>{item.label}</span>
             </Link>
           ))}
         </nav>
@@ -56,36 +56,57 @@ export function Header() {
         <div className="hidden md:block">
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--gold)]/60 px-5 py-2.5 text-xs uppercase tracking-[0.24em] text-[var(--gold)] transition-transform duration-300 hover:-translate-y-0.5"
+            className="group inline-flex items-center gap-2 rounded-full bg-[#252620] px-5 py-3 text-[10px] font-medium uppercase tracking-[0.16em] text-white transition duration-300 hover:bg-[var(--gold)]"
           >
-            Start a project
+            Start a project <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </div>
 
         <button
           type="button"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-[var(--ivory)] md:hidden"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border)] text-[var(--ivory)] md:hidden"
           aria-label="Toggle menu"
+          aria-expanded={isMenuOpen}
           onClick={() => setIsMenuOpen((state) => !state)}
         >
           {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
 
-      <div
-        className={[
-          "border-t border-white/10 bg-[var(--base)]/95 backdrop-blur-xl md:hidden",
-          isMenuOpen ? "block" : "hidden",
-        ].join(" ")}
-      >
-        <nav className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-6 text-sm uppercase tracking-[0.22em] text-[var(--muted)]">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="hover:text-[var(--ivory)]">
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.nav
+            aria-label="Mobile navigation"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.28, ease: "easeInOut" }}
+            className="overflow-hidden border-t border-[var(--border)] bg-[var(--base)]/95 backdrop-blur-xl md:hidden"
+          >
+            <div className="mx-auto flex max-w-7xl flex-col px-6 py-4">
+              {navItems.map((item, index) => (
+                <motion.div
+                  key={item.href}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.04 }}
+                >
+                  <Link
+                    href={item.href}
+                    aria-current={pathname === item.href ? "page" : undefined}
+                    className="flex items-center justify-between border-b border-[var(--border)] py-4 font-[var(--font-display)] text-3xl text-[var(--ivory)]"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.label}
+                    <ArrowUpRight size={18} className="text-[var(--gold)]" />
+                  </Link>
+                </motion.div>
+              ))}
+              <p className="pt-5 text-[10px] uppercase tracking-[0.2em] text-[var(--muted)]">Independent creative studio · Est. 2018</p>
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

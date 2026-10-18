@@ -1,53 +1,41 @@
+import type { Metadata } from "next";
+
 import { SiteShell } from "@/src/components/layout/site-shell";
+import { ContactForm } from "@/src/components/sections/contact-form";
 import { Reveal } from "@/src/components/sections/reveal";
 import { contactDetails } from "@/src/content/site";
+
+export const metadata: Metadata = {
+  title: "Start a Project | Contact Ad Vibe",
+  description: "Tell Ad Vibe about your graphic design project. We would love to hear about your next idea.",
+};
 
 export default function ContactPage() {
   return (
     <SiteShell>
       <section className="mx-auto max-w-7xl px-5 pb-24 pt-12 md:px-8 md:pt-20">
-        <Reveal className="mb-8 text-xs uppercase tracking-[0.34em] text-[var(--gold)]">Contact</Reveal>
+        <Reveal className="mb-8 text-xs uppercase tracking-[0.34em] text-[var(--gold)]">The start of something good</Reveal>
         <Reveal className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <h1 className="font-[var(--font-display)] text-5xl leading-[0.9] text-[var(--ivory)] md:text-7xl">
-              Tell us what you&apos;re building.
+              Have a good idea? Let&apos;s give it a look.
             </h1>
-            <div className="mt-8 space-y-4 text-[var(--muted)]">
+            <p className="mt-6 max-w-md text-sm leading-7 text-[var(--muted)]">
+              Tell us what you&apos;re thinking—even if it&apos;s still just a sketch. We work remotely with good people everywhere.
+            </p>
+            <div className="mt-8 space-y-3 text-[var(--muted)]">
               {contactDetails.map((item) => (
-                <div key={item.label} className="rounded-full border border-white/10 bg-white/3 px-4 py-3 text-sm">
-                  <span className="mr-3 text-[var(--gold)]">{item.label}</span>
-                  {item.value}
+                <div key={item.label} className="border-b border-[var(--border)] py-3 text-sm">
+                  <span className="mr-4 text-[10px] uppercase tracking-[0.16em] text-[var(--gold)]">{item.label}</span>
+                  {item.href ? <a className="hover:text-[var(--ivory)]" href={item.href}>{item.value}</a> : item.value}
                 </div>
               ))}
             </div>
           </div>
 
-          <form className="rounded-[28px] border border-white/10 bg-white/3 p-6 md:p-8">
-            <div className="grid gap-5 md:grid-cols-2">
-              <label className="text-sm text-[var(--muted)]">
-                <span className="mb-2 block uppercase tracking-[0.18em] text-[var(--ivory)]">Name</span>
-                <input className="w-full rounded-full border border-white/10 bg-transparent px-4 py-3 text-[var(--ivory)] outline-none placeholder:text-[var(--muted)]" placeholder="Your name" />
-              </label>
-              <label className="text-sm text-[var(--muted)]">
-                <span className="mb-2 block uppercase tracking-[0.18em] text-[var(--ivory)]">Email</span>
-                <input className="w-full rounded-full border border-white/10 bg-transparent px-4 py-3 text-[var(--ivory)] outline-none placeholder:text-[var(--muted)]" placeholder="you@example.com" />
-              </label>
-            </div>
-
-            <label className="mt-5 block text-sm text-[var(--muted)]">
-              <span className="mb-2 block uppercase tracking-[0.18em] text-[var(--ivory)]">Subject</span>
-              <input className="w-full rounded-full border border-white/10 bg-transparent px-4 py-3 text-[var(--ivory)] outline-none placeholder:text-[var(--muted)]" placeholder="Project type" />
-            </label>
-
-            <label className="mt-5 block text-sm text-[var(--muted)]">
-              <span className="mb-2 block uppercase tracking-[0.18em] text-[var(--ivory)]">Message</span>
-              <textarea rows={6} className="w-full rounded-[24px] border border-white/10 bg-transparent px-4 py-3 text-[var(--ivory)] outline-none placeholder:text-[var(--muted)]" placeholder="Tell us about your goals, timeline and project scope." />
-            </label>
-
-            <button type="submit" className="mt-8 inline-flex items-center justify-center rounded-full border border-[var(--gold)]/60 px-6 py-3 text-xs uppercase tracking-[0.22em] text-[var(--gold)] transition hover:-translate-y-0.5">
-              Send inquiry
-            </button>
-          </form>
+          <Reveal delay={0.08} className="border-t border-[var(--border)] pt-2">
+            <ContactForm />
+          </Reveal>
         </Reveal>
       </section>
     </SiteShell>

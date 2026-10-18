@@ -10,6 +10,7 @@
     "seed:admin": "tsx scripts/seed-admin.ts"
   },
   "dependencies": {
+    "@next/env": "^16.4.2",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.11.0",
     "framer-motion": "^14.3.0",

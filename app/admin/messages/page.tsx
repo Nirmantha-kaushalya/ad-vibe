@@ -1,30 +1,30 @@
-export default function AdminMessagesPage() {
+import { MessageInbox } from "@/src/components/admin/message-inbox";
+import { connectToDatabase } from "@/src/lib/mongodb";
+import { Message } from "@/src/models/message";
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminMessagesPage() {
+  await connectToDatabase();
+  const messages = await Message.find().sort({ createdAt: -1 }).lean();
+  const items = messages.map((message) => ({
+    id: String(message._id),
+    name: message.name,
+    email: message.email,
+    subject: message.subject,
+    message: message.message,
+    read: message.read,
+    createdAt: message.createdAt.toISOString(),
+  }));
+
   return (
     <div>
       <div className="mb-8">
-        <div className="text-xs uppercase tracking-[0.3em] text-[var(--gold)]">Inbox</div>
-        <h1 className="mt-2 font-[var(--font-display)] text-4xl text-[var(--ivory)] md:text-5xl">Messages</h1>
+        <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--gold)]">Notes from the outside world</div>
+        <h1 className="mt-2 font-[var(--font-display)] text-5xl text-[var(--ivory)]">Inbox</h1>
+        <p className="mt-2 text-sm text-[var(--muted)]">{items.filter((message) => !message.read).length} unread · {items.length} total</p>
       </div>
-
-      <div className="space-y-4">
-        {[
-          { name: "Alicia Prenn", subject: "Brand refresh", read: false },
-          { name: "Daniel Roe", subject: "Website launch", read: true },
-        ].map((message) => (
-          <div key={message.name} className="flex items-center justify-between rounded-[24px] border border-white/10 bg-white/3 p-4">
-            <div>
-              <div className="text-lg text-[var(--ivory)]">{message.name}</div>
-              <div className="mt-1 text-sm text-[var(--muted)]">{message.subject}</div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="rounded-full border border-white/10 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-[var(--muted)]">
-                {message.read ? "Read" : "Unread"}
-              </span>
-              <button type="button" className="rounded-full border border-[var(--gold)]/60 px-3 py-2 text-[10px] uppercase tracking-[0.2em] text-[var(--gold)]">Mark read</button>
-            </div>
-          </div>
-        ))}
-      </div>
+      <MessageInbox initialMessages={items} />
     </div>
   );
 }

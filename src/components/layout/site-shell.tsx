@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Footer } from "@/src/components/layout/footer";
 import { Header } from "@/src/components/layout/header";
 import { CursorFollower } from "@/src/components/layout/cursor-follower";
+import { PageTransition } from "@/src/components/layout/page-transition";
 
 export function SiteShell({ children }: { children: ReactNode }) {
   return (
@@ -10,7 +11,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <div className="noise-overlay" aria-hidden="true" />
       <CursorFollower />
       <Header />
-      <main className="pt-24">{children}</main>
+      <PageTransition>{children}</PageTransition>
       <Footer />
     </div>
   );
