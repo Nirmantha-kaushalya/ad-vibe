@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowUpRight, Search, X } from "lucide-react";
+import { createPortal } from "react-dom";
+import { useEffect, useMemo, useState } from "react";
 
 import type { PublicWork } from "@/src/lib/work-data";
 
@@ -11,6 +12,7 @@ type Filter = "all" | "image" | "video";
 
 export function WorksGallery({ works }: { works: PublicWork[] }) {
   const [filter, setFilter] = useState<Filter>("all");
+  const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<PublicWork | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const filters: { value: Filter; label: string }[] = [
@@ -18,7 +20,14 @@ export function WorksGallery({ works }: { works: PublicWork[] }) {
     { value: "image", label: "Image" },
     { value: "video", label: "Video" },
   ];
-  const visibleWorks = filter === "all" ? works : works.filter((work) => work.type === filter);
+  const visibleWorks = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return works.filter((work) => {
+      const matchesType = filter === "all" || work.type === filter;
+      const searchableText = `${work.title} ${work.description} ${work.type}`.toLowerCase();
+      return matchesType && (!normalizedQuery || searchableText.includes(normalizedQuery));
+    });
+  }, [filter, query, works]);
 
   useEffect(() => {
     if (!selected) return;
@@ -35,40 +44,63 @@ export function WorksGallery({ works }: { works: PublicWork[] }) {
 
   return (
     <>
-      <div className="mb-9 flex flex-wrap items-center gap-2" aria-label="Filter projects">
-        {filters.map((item) => {
-          const active = filter === item.value;
-          return (
-            <button
-              key={item.value}
-              type="button"
-              aria-pressed={active}
-              onClick={() => setFilter(item.value)}
-              className={`rounded-full border px-4 py-2.5 text-[10px] uppercase tracking-[0.14em] transition-colors ${
-                active
-                  ? "border-[#252620] bg-[#252620] text-white"
-                  : "border-[var(--border)] text-[var(--muted)] hover:border-[var(--gold)] hover:text-[var(--ivory)]"
-              }`}
-            >
-              {item.label}
-              <span className="ml-2 opacity-60">
-                {item.value === "all" ? works.length : works.filter((work) => work.type === item.value).length}
-              </span>
-            </button>
-          );
-        })}
+      <div className="mb-7 flex flex-col gap-3 sm:mb-9 sm:flex-row sm:items-center sm:justify-between">
+        <label className="flex min-h-12 items-center gap-3 rounded-full border border-[var(--border)] bg-white/60 px-4 sm:max-w-sm sm:flex-1">
+          <Search size={16} aria-hidden="true" className="shrink-0 text-[var(--muted)]" />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search my work"
+            aria-label="Search work"
+            className="min-w-0 flex-1 border-0 bg-transparent py-3 text-sm outline-none placeholder:text-[var(--muted)]"
+          />
+        </label>
+        <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Filter work by type">
+          {filters.map((item) => {
+            const active = filter === item.value;
+            return (
+              <button
+                key={item.value}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setFilter(item.value)}
+                className={`min-h-11 shrink-0 rounded-full border px-4 text-xs transition-colors ${
+                  active
+                    ? "border-[#252620] bg-[#252620] text-white"
+                    : "border-[var(--border)] text-[var(--muted)] hover:border-[var(--gold)] hover:text-[var(--ivory)]"
+                }`}
+              >
+                {item.label}
+                <span className="ml-2 opacity-60">
+                  {item.value === "all" ? works.length : works.filter((work) => work.type === item.value).length}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {visibleWorks.length === 0 ? (
         <div className="border-y border-[var(--border)] py-16 text-center">
-          <p className="font-[var(--font-display)] text-3xl">No {filter === "all" ? "" : `${filter} `}projects just yet.</p>
-          <p className="mt-2 text-sm text-[var(--muted)]">Check back soon for new work from the studio.</p>
+          <p className="font-[var(--font-display)] text-3xl">
+            {works.length === 0 ? "New work coming soon." : "No work found."}
+          </p>
+          {works.length > 0 && (
+            <button
+              type="button"
+              onClick={() => { setFilter("all"); setQuery(""); }}
+              className="mt-3 min-h-11 px-3 text-sm text-[var(--gold)] underline underline-offset-4"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
       ) : (
-        <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-5 gap-y-8 min-[520px]:grid-cols-2 md:gap-x-6 md:gap-y-10 xl:grid-cols-3">
           {visibleWorks.map((work, index) => {
             const preview = work.type === "video" ? work.thumbnailUrl : work.url;
-            if (!preview) return null;
+            if (work.type === "image" && !preview) return null;
             return (
               <motion.article
                 key={work.id}
@@ -76,7 +108,7 @@ export function WorksGallery({ works }: { works: PublicWork[] }) {
                 whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.16 }}
                 transition={{ duration: 0.55, delay: (index % 3) * 0.06 }}
-                className={`group ${index % 3 === 1 ? "xl:translate-y-12" : ""}`}
+                className="group"
               >
                 <div className="image-hover relative aspect-[4/5] overflow-hidden bg-[#e8e4da]">
                   {work.type === "video" ? (
@@ -108,22 +140,16 @@ export function WorksGallery({ works }: { works: PublicWork[] }) {
                     >
                       <Image src={work.url} alt={work.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw" className="object-cover" />
                       <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-70 transition-opacity group-hover:opacity-100" />
-                      <span className="absolute bottom-5 left-5 right-5 flex items-end justify-between text-white">
-                        <span>
-                          <span className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-white/80">Selected work</span>
-                          <span className="block font-[var(--font-display)] text-3xl">{work.title}</span>
-                        </span>
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/65">
-                          <ArrowUpRight size={17} />
-                        </span>
+                      <span className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/65 text-white">
+                        <ArrowUpRight size={17} />
                       </span>
                     </button>
                   )}
                 </div>
-                <div className="flex items-start justify-between gap-3 pt-4">
+                <div className="flex items-start justify-between gap-3 pt-3">
                   <div>
-                    <h2 className="font-[var(--font-display)] text-2xl text-[var(--ivory)]">{work.title}</h2>
-                    <p className="mt-1 max-w-md text-sm leading-6 text-[var(--muted)]">{work.description}</p>
+                    <h2 className="text-sm font-medium text-[var(--ivory)] sm:text-base">{work.title}</h2>
+                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-[var(--muted)]">{work.description}</p>
                   </div>
                   <span className="mt-2 shrink-0 text-[9px] uppercase tracking-[0.15em] text-[var(--gold)]">
                     {work.type}
@@ -135,8 +161,8 @@ export function WorksGallery({ works }: { works: PublicWork[] }) {
         </div>
       )}
 
-      <AnimatePresence>
-        {selected && (
+      {selected && typeof document !== "undefined" && createPortal(
+        <AnimatePresence>
           <motion.div
             role="dialog"
             aria-modal="true"
@@ -150,8 +176,11 @@ export function WorksGallery({ works }: { works: PublicWork[] }) {
             <button
               type="button"
               aria-label="Close project viewer"
-              onClick={() => setSelected(null)}
-              className="absolute right-5 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/25 text-white transition hover:bg-white/10"
+              onClick={(event) => {
+                event.stopPropagation();
+                setSelected(null);
+              }}
+              className="fixed right-5 top-5 z-[110] flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-[#171815]/80 text-white transition hover:bg-white/20"
             >
               <X size={19} />
             </button>
@@ -182,8 +211,9 @@ export function WorksGallery({ works }: { works: PublicWork[] }) {
               </div>
             </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body,
+      )}
     </>
   );
 }

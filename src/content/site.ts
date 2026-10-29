@@ -1,8 +1,6 @@
 export const navItems = [
-  { label: "Home", href: "/" },
+  { label: "Work", href: "/#work" },
   { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
-  { label: "Works", href: "/works" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -68,6 +66,5 @@ export const aboutStats = [
 
 export const contactDetails = [
   { label: "Email", value: "advibe.art@gmail.com", href: "mailto:advibe.art@gmail.com" },
-  { label: "Phone", value: "072 812 5502", href: "tel:0728125502" },
-  { label: "Availability", value: "Remote · Worldwide" },
+  { label: "WhatsApp", value: "+94 72 812 5502", href: "https://wa.me/94728125502" },
 ];
