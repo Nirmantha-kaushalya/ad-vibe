@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { ArrowUpRight, LayoutDashboard, MessageSquareText, PanelsTopLeft } from "lucide-react";
@@ -28,7 +29,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
       <div className="mx-auto flex min-h-screen max-w-[1600px] flex-col gap-5 px-4 py-4 md:flex-row md:gap-8 md:px-8 md:py-8">
         <aside className="flex shrink-0 flex-col rounded-[24px] border border-[var(--border)] bg-[var(--panel)] p-4 md:sticky md:top-8 md:h-[calc(100svh-4rem)] md:w-64 md:p-5">
           <Link href="/admin/dashboard" className="mb-5 flex items-center gap-3 px-2 py-2">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#252620] text-[10px] font-medium tracking-[0.12em] text-white">AV</span>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black">
+              <Image src="/ad-vibe-logo.png" alt="" width={30} height={23} sizes="30px" className="h-7 w-8 object-contain" />
+            </span>
             <span>
               <span className="block text-[10px] font-semibold uppercase tracking-[0.25em]">Ad Vibe</span>
               <span className="mt-1 block text-[10px] text-[var(--muted)]">Studio workspace</span>

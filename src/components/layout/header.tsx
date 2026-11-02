@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -29,8 +30,15 @@ export function Header() {
     >
       <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-4 md:px-10 md:py-5">
         <Link href="/" className="group flex shrink-0 items-center gap-3 text-[var(--ivory)]" aria-label="Ad Vibe home">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--gold)]/50 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--gold)] transition duration-300 group-hover:bg-[var(--gold)] group-hover:text-white sm:h-10 sm:w-10 sm:text-[11px]">
-            AV
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--gold)]/50 bg-black transition-colors duration-300 group-hover:bg-[var(--gold)] sm:h-10 sm:w-10">
+            <Image
+              src="/ad-vibe-logo.png"
+              alt=""
+              width={30}
+              height={23}
+              sizes="30px"
+              className="h-6 w-7 object-contain sm:h-7 sm:w-8"
+            />
           </span>
           <span className="hidden text-[11px] font-semibold uppercase tracking-[0.24em] sm:inline sm:tracking-[0.32em]">Ad Vibe</span>
         </Link>
